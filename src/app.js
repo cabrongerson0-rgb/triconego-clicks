@@ -125,11 +125,53 @@ app.get('/', (req, res) => {
  * Ruta de estado del servidor
  */
 app.get('/health', (req, res) => {
+  const telegramConfig = require('./config/telegram.config');
+  
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    message: 'Bot de Telegram funcionando correctamente'
+    message: 'Bot de Telegram funcionando correctamente',
+    config: {
+      telegramConfigured: telegramConfig.isConfigured(),
+      hasToken: !!process.env.TELEGRAM_BOT_TOKEN,
+      hasChatId: !!process.env.TELEGRAM_CHAT_ID,
+      chatId: process.env.TELEGRAM_CHAT_ID ? 'Configurado' : 'No configurado',
+      nodeEnv: process.env.NODE_ENV || 'development'
+    }
   });
+});
+
+/**
+ * Ruta de prueba para enviar mensaje de Telegram manualmente
+ */
+app.get('/test-telegram', async (req, res) => {
+  const telegramService = require('./services/telegram.service');
+  const VisitorUtils = require('./utils/visitor.utils');
+  
+  try {
+    const visitorData = VisitorUtils.collectVisitorData(req);
+    const result = await telegramService.notifyNewVisitor(visitorData);
+    
+    if (result.success) {
+      res.json({
+        success: true,
+        message: 'Mensaje de prueba enviado correctamente a Telegram',
+        visitorData
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: 'Error al enviar mensaje',
+        error: result.error
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error en el servidor',
+      error: error.message
+    });
+  }
 });
 
 /**
