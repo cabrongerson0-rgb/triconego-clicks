@@ -1,0 +1,18 @@
+{
+  "name": "telegram-visitor-notifier",
+  "version": "1.0.0",
+  "description": "Bot de Telegram para notificar visitas en tiempo real",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "keywords": ["telegram", "bot", "visitor", "tracking"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.5",
+    "express": "^4.18.2",
+    "dotenv": "^16.4.1"
+  }
+}
