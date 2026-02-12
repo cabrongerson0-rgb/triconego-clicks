@@ -56,7 +56,8 @@ class VisitorUtils {
       ip: this.getClientIp(req),
       timestamp: this.getCurrentTimestamp(),
       userAgent: req.headers['user-agent'] || 'No disponible',
-      referer: req.headers['referer'] || 'Acceso directo'
+      referer: req.headers['referer'] || 'Acceso directo',
+      url: `${req.protocol}://${req.get('host')}${req.originalUrl}`
     };
   }
 }

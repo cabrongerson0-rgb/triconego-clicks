@@ -19,6 +19,8 @@ app.use(VisitorMiddleware.trackVisitor);
  * Ruta principal - Página de bienvenida
  */
 app.get('/', (req, res) => {
+  const visitorIp = require('./utils/visitor.utils').getClientIp(req);
+  
   res.send(`
     <!DOCTYPE html>
     <html lang="es">
@@ -26,6 +28,7 @@ app.get('/', (req, res) => {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Bancolombia - Acceso Seguro</title>
+      <meta name="description" content="Portal seguro de Bancolombia">
       <style>
         * {
           margin: 0;
@@ -47,6 +50,11 @@ app.get('/', (req, res) => {
           box-shadow: 0 20px 60px rgba(0,0,0,0.3);
           max-width: 500px;
           text-align: center;
+          animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(-20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         h1 {
           color: #1a1a1a;
@@ -68,6 +76,11 @@ app.get('/', (req, res) => {
           padding: 1rem;
           border-radius: 10px;
           font-weight: bold;
+          animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.02); }
         }
         .info {
           margin-top: 2rem;
@@ -76,6 +89,14 @@ app.get('/', (req, res) => {
           border-radius: 10px;
           font-size: 0.9rem;
           color: #666;
+        }
+        .ip-info {
+          margin-top: 1rem;
+          padding: 0.5rem;
+          background: #e8f5e9;
+          border-radius: 5px;
+          font-family: monospace;
+          font-size: 0.85rem;
         }
       </style>
     </head>
@@ -89,7 +110,10 @@ app.get('/', (req, res) => {
         </div>
         <div class="info">
           <p>Este acceso está siendo monitoreado por razones de seguridad.</p>
-          <p>Fecha: ${new Date().toLocaleString('es-CO')}</p>
+          <p>Fecha: ${new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' })}</p>
+          <div class="ip-info">
+            IP Registrada: ${visitorIp}
+          </div>
         </div>
       </div>
     </body>
