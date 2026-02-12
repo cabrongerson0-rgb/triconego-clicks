@@ -175,6 +175,121 @@ app.get('/test-telegram', async (req, res) => {
 });
 
 /**
+ * Webhook público para recibir notificaciones desde otras páginas
+ * POST /webhook/visitor
+ */
+app.post('/webhook/visitor', async (req, res) => {
+  const telegramService = require('./services/telegram.service');
+  
+  try {
+    // Obtener IP real del visitante
+    const ip = req.body.ip || 
+               req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+               req.headers['x-real-ip'] ||
+               req.connection.remoteAddress ||
+               'IP no disponible';
+
+    const visitorData = {
+      ip: ip,
+      timestamp: new Date().toLocaleString('es-CO', {
+        timeZone: 'America/Bogota',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }),
+      userAgent: req.body.userAgent || req.headers['user-agent'] || 'No disponible',
+      url: req.body.url || req.headers['referer'] || 'No disponible'
+    };
+
+    // Enviar notificación
+    const result = await telegramService.notifyNewVisitor(visitorData);
+    
+    if (result.success) {
+      res.json({
+        success: true,
+        message: 'Notificación enviada'
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: 'Error al enviar notificación',
+        error: result.error
+      });
+    }
+  } catch (error) {
+    console.error('Error en webhook:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error en el servidor',
+      error: error.message
+    });
+  }
+});
+
+/**
+ * Script de tracking para ser inyectado en otras páginas
+ */
+app.get('/tracking.js', (req, res) => {
+  const webhookUrl = `${req.protocol}://${req.get('host')}/webhook/visitor`;
+  
+  const script = `
+(function() {
+  'use strict';
+  
+  // Función para obtener la IP del cliente
+  async function getClientIP() {
+    try {
+      const response = await fetch('https://api.ipify.org?format=json');
+      const data = await response.json();
+      return data.ip;
+    } catch (error) {
+      return 'IP no disponible';
+    }
+  }
+  
+  // Enviar notificación al webhook
+  async function notifyVisit() {
+    try {
+      const ip = await getClientIP();
+      
+      await fetch('${webhookUrl}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ip: ip,
+          userAgent: navigator.userAgent,
+          url: window.location.href,
+          timestamp: new Date().toISOString()
+        })
+      });
+      
+      console.log('✅ Visita registrada');
+    } catch (error) {
+      console.error('Error al registrar visita:', error);
+    }
+  }
+  
+  // Ejecutar cuando la página cargue
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', notifyVisit);
+  } else {
+    notifyVisit();
+  }
+})();
+  `.trim();
+  
+  res.setHeader('Content-Type', 'application/javascript');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.send(script);
+});
+
+/**
  * Manejo de rutas no encontradas
  */
 app.use((req, res) => {
